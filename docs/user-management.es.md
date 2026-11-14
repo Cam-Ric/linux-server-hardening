@@ -4,7 +4,7 @@
 
 BlackBox es un laboratorio de servidor Linux que simula la gestión de accesos por departamentos en una organización que maneja información empresarial sensible. Las cuentas locales se asignan a grupos funcionales para organizar la administración y los permisos del sistema de archivos.
 
-Este documento recoge la **configuración observada**. No afirma que la automatización del alta de usuarios, la caducidad de contraseñas o las restricciones PAM se hayan probado en esta fase.
+Este documento recoge la **configuración realizada**. No afirma que la automatización del alta de usuarios, la caducidad de contraseñas o las restricciones PAM se hayan probado en esta fase.
 
 ## Inventario de cuentas verificado
 
