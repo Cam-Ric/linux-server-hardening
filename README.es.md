@@ -1,5 +1,8 @@
 [🇬🇧 Read in English](README.md)
-> 🇪🇸 **ES:** Laboratorio de seguridad en servidores Linux centrado en gestión de usuarios, control de acceso, auditoría, automatización en Bash y copias de seguridad.
+
+#  linux-server-hardening
+
+> Laboratorio de seguridad en servidores Linux centrado en gestión de usuarios, control de acceso, auditoría, automatización en Bash y copias de seguridad.
 
 ---
 
