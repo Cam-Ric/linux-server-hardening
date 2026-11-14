@@ -3,7 +3,7 @@
 
 ---
 
-### 🖥️ System Environment / Entorno del Sistema
+### 🖥️ Entorno del Sistema
 ![Terminal output showing system specifications with Fastfetch](screenshots/Tabby_QsrQolBKm3.png)
 
 ## Implementación de Seguridad y Documentación Técnica
