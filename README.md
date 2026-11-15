@@ -61,3 +61,18 @@ These tests validate directory-level access behavior. Individual file permission
 ### Technical Skills Demonstrated
 
 `Linux Administration` · `User & Group Management` · `Unix Permissions` · `SGID` · `POSIX ACLs` · `Access Control Validation` · `Bash` · `Security Documentation`
+
+### Password Security and User Automation
+
+BlackBox implements a centralized password security policy using PAM, `pam_pwquality` and a custom multilingual CrackLib dictionary covering English, Spanish and Catalan/Valencian.
+
+The configuration includes password complexity requirements, username similarity checks, dictionary validation, root enforcement and a password aging policy of **1/360/30 days**, with mandatory password change at first login.
+
+A Bash provisioning script automates local user creation, departmental group assignment and password aging configuration.
+
+**Technical documentation:**
+
+- [Password Security Policy](docs/password-security.md)
+- [Automated User Provisioning](docs/user-automation.md)
+- [Password Security Policy — Spanish](docs/password-security.es.md)
+- [Automated User Provisioning — Spanish](docs/user-automation.es.md)
