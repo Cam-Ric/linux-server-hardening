@@ -1,6 +1,6 @@
 [🇪🇸 Leer en Español](README.es.md)
 
-# BlackBox — Linux Server Hardening
+# Linux Server Hardening
 
 > Hands-on Linux server hardening lab covering user management, departmental access control, password security, Bash automation, system auditing, and backup and recovery.
 
