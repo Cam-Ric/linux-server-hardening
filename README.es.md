@@ -60,3 +60,18 @@ Estas pruebas verifican el comportamiento de los permisos a nivel de directorio.
 ### Competencias Técnicas Demostradas
 
 `Administración Linux` · `Gestión de Usuarios y Grupos` · `Permisos Unix` · `SGID` · `ACLs POSIX` · `Control de Acceso` · `Bash` · `Documentación de Seguridad`
+
+### Seguridad de Contraseñas y Automatización de Usuarios
+
+BlackBox implementa una política centralizada de seguridad de contraseñas mediante PAM, `pam_pwquality` y un diccionario personalizado de CrackLib que incluye inglés, castellano y catalán/valenciano.
+
+La configuración incorpora requisitos de complejidad, comprobaciones de similitud con el usuario, validación mediante diccionarios, aplicación de las reglas a root y una política de caducidad de **1/360/30 días**, con cambio obligatorio de contraseña en el primer inicio de sesión.
+
+Un script Bash automatiza la creación de usuarios locales, la asignación de grupos departamentales y la configuración de caducidad.
+
+**Documentación técnica:**
+
+- [Política de seguridad de contraseñas](docs/password-security.es.md)
+- [Automatización de usuarios](docs/user-automation.es.md)
+- [Password Security Policy — English](docs/password-security.md)
+- [Automated User Provisioning — English](docs/user-automation.md)
