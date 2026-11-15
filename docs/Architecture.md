@@ -123,7 +123,7 @@ The backup directory is restricted to root access.
 
 Backup archives are created with restrictive permissions to reduce unauthorized access.
 
-### Backup workflow
+### Backup workflow.
 
 ```
 Cron Scheduler
