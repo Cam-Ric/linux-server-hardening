@@ -16,7 +16,7 @@ BlackBox is a Linux system administration and security lab designed to simulate 
 
 The following documentation describes configurations implemented and validated on the server.
 
-### 1. User & Group Management
+# 1. User & Group Management
 
 **21 local user accounts** were identified across seven organizational and administrative groups, including Finance, Management, Human Resources, Marketing, Developers, IT Support, and Administrators.
 
@@ -29,7 +29,7 @@ Key concepts demonstrated:
 
 **Documentation:** [User & Group Management](docs/user-management.md) | [Versión en español](docs/user-management.es.md)
 
-### 2. Departmental Access Control — SGID & POSIX ACLs
+# 2. Departmental Access Control — SGID & POSIX ACLs
 
 Implemented departmental shared directories under `/srv/projects/` using Linux ownership, permissions, SGID, and POSIX Access Control Lists.
 
@@ -62,7 +62,7 @@ These tests validate directory-level access behavior. Individual file permission
 
 `Linux Administration` · `User & Group Management` · `Unix Permissions` · `SGID` · `POSIX ACLs` · `Access Control Validation` · `Bash` · `Security Documentation`
 
-### Password Security and User Automation
+# 3. Password Security and User Automation
 
 BlackBox implements a centralized password security policy using PAM, `pam_pwquality` and a custom multilingual CrackLib dictionary covering English, Spanish and Catalan/Valencian.
 
