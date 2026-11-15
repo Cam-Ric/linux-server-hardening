@@ -15,7 +15,7 @@
 
 La siguiente documentación describe las configuraciones implementadas y verificadas en el servidor.
 
-### 1. Gestión de Usuarios y Grupos
+# 1. Gestión de Usuarios y Grupos
 
 Se identificaron **21 cuentas de usuario locales**, distribuidas entre siete grupos organizativos y administrativos: Finanzas, Dirección, Recursos Humanos, Marketing, Desarrollo, Soporte Informático y Administradores.
 
@@ -28,7 +28,7 @@ Se identificaron **21 cuentas de usuario locales**, distribuidas entre siete gru
 
 **Documentación:** [Gestión de Usuarios y Grupos](docs/user-management.es.md) | [Versión en inglés](docs/user-management.md)
 
-### 2. Control de Acceso Departamental — SGID y ACLs POSIX
+# 2. Control de Acceso Departamental — SGID y ACLs POSIX
 
 Se configuraron directorios compartidos por departamento en `/srv/projects/`, utilizando propietarios, grupos, permisos Unix, SGID y listas de control de acceso POSIX (ACLs).
 
@@ -61,7 +61,7 @@ Estas pruebas verifican el comportamiento de los permisos a nivel de directorio.
 
 `Administración Linux` · `Gestión de Usuarios y Grupos` · `Permisos Unix` · `SGID` · `ACLs POSIX` · `Control de Acceso` · `Bash` · `Documentación de Seguridad`
 
-### Seguridad de Contraseñas y Automatización de Usuarios
+# 3. Seguridad de Contraseñas y Automatización de Usuarios
 
 BlackBox implementa una política centralizada de seguridad de contraseñas mediante PAM, `pam_pwquality` y un diccionario personalizado de CrackLib que incluye inglés, castellano y catalán/valenciano.
 
@@ -75,3 +75,28 @@ Un script Bash automatiza la creación de usuarios locales, la asignación de gr
 - [Automatización de usuarios](docs/user-automation.es.md)
 - [Password Security Policy — English](docs/password-security.md)
 - [Automated User Provisioning — English](docs/user-automation.md)
+
+# 4. Copias de seguridad automatizadas y recuperación
+
+**Tecnologías:** `Linux` · `Bash` · `cron` · `tar` · `gzip` · `flock` · `find` · `cmp`
+
+Implementación de un sistema automatizado de copias de seguridad y recuperación para el departamento financiero de BlackBox, centrado en la protección de datos, la fiabilidad operativa y la administración segura de servidores Linux.
+
+**Características principales:**
+
+- **Automatización diaria:** Copias programadas a las **02:00** mediante el crontab de root.
+- **Protección de datos:** Backups de `/home/cfo` y `/home/accountant1`.
+- **Verificación de integridad:** Comprobaciones GZIP y TAR antes de publicar cada archivo.
+- **Protección contra concurrencia:** Bloqueo exclusivo con `flock` para impedir ejecuciones simultáneas.
+- **Prevención de sobrescrituras:** Protección frente al reemplazo accidental de copias existentes.
+- **Retención de 30 días:** Eliminación automática de copias antiguas mediante `find`, validada en un laboratorio aislado.
+- **Permisos restrictivos:** Directorio de backups con permisos `700` y nuevos archivos con permisos `600`.
+- **Pruebas de recuperación:** Restauración controlada y comparación de archivos mediante `cmp`.
+- **Registro de operaciones:** Logs con marcas de tiempo para documentar copias, errores y operaciones de retención.
+
+**Validación:** Se superaron las pruebas de creación de backups, integridad, restauración, prevención de duplicados y retención. La nueva versión del script fue desplegada y se verificó la configuración de la tarea diaria de cron.
+
+**Documentación técnica:**
+
+- [Copias de seguridad y recuperación — Español](docs/backup-and-recovery.es.md)
+- [Backup & Recovery — English](docs/backup-and-recovery.md)
