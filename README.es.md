@@ -1,6 +1,6 @@
 [🇬🇧 Read in English](README.md)
 
-# Securización y administración de servidores Linux
+# Linux Server Hardening
 
 > Laboratorio práctico de administración y securización de servidores Linux que abarca gestión de usuarios, control de accesos, seguridad de contraseñas, automatización con Bash, auditoría del sistema y copias de seguridad.
 
