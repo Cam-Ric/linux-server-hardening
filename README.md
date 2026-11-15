@@ -76,3 +76,28 @@ A Bash provisioning script automates local user creation, departmental group ass
 - [Automated User Provisioning](docs/user-automation.md)
 - [Password Security Policy — Spanish](docs/password-security.es.md)
 - [Automated User Provisioning — Spanish](docs/user-automation.es.md)
+
+# 4. Automated Backup & Recovery
+
+**Technologies:** `Linux` · `Bash` · `cron` · `tar` · `gzip` · `flock` · `find` · `cmp`
+
+Implemented an automated backup and recovery solution for the BlackBox finance department, focusing on data protection, operational reliability, and secure system administration.
+
+**Key features:**
+
+- **Daily automation:** Backups scheduled at **02:00 AM** using the root crontab.
+- **Data protection:** Automated backups of `/home/cfo` and `/home/accountant1`.
+- **Integrity verification:** GZIP and TAR validation before publishing each archive.
+- **Concurrency protection:** Exclusive locking with `flock` to prevent simultaneous executions.
+- **Overwrite prevention:** Existing daily backup archives cannot be silently replaced.
+- **30-day retention:** Automated cleanup of expired backups using `find`, validated in an isolated test environment.
+- **Restricted permissions:** Root-only backup directory (`700`) and new backup archives (`600`).
+- **Recovery testing:** Successful controlled restoration and file integrity comparison using `cmp`.
+- **Operational logging:** Timestamped records of backup creation, errors, and retention operations.
+
+**Validation:** Backup creation, archive integrity, restoration, duplicate prevention, and retention were successfully tested. The updated backup script was deployed, and the daily cron job was verified as configured.
+
+**Technical documentation:**
+
+- [Backup & Recovery — English](docs/backup-and-recovery.md)
+- [Copias de seguridad y recuperación — Español](docs/backup-and-recovery.es.md)
