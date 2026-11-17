@@ -2,7 +2,7 @@
 
 ## 1. Descripción general del proyecto
 
-**BlackBox** es un proyecto práctico de administración y securización de servidores Linux (_Linux Server Hardening_), diseñado para simular la gestión de un servidor interno de una pequeña organización.
+**Linux server hardening** es un proyecto práctico de administración y securización de servidores Linux (_Linux Server Hardening_), diseñado para simular la gestión de un servidor interno de una pequeña organización.
 
 El proyecto demuestra conocimientos prácticos en:
 
