@@ -4,15 +4,17 @@
 
 > Laboratorio práctico de administración y securización de servidores Linux que abarca gestión de usuarios, control de accesos, seguridad de contraseñas, automatización con Bash, auditoría del sistema y copias de seguridad.
 
+> **Estado del proyecto: En desarrollo activo.** Los controles de seguridad implementados se documentan con pruebas prácticas y evidencias. Las mejoras previstas se recogen en [Alcance del proyecto y futuras mejoras](#alcance-del-proyecto-y-futuras-mejoras).
+
 ---
 
 ## 🖥️ Entorno del sistema
 
-![Información del sistema BlackBox mostrada mediante Fastfetch](screenshots/Tabby_QsrQolBKm3.png)
+![Información del sistema Linux Server Hardening mostrada mediante Fastfetch](screenshots/Tabby_QsrQolBKm3.png)
 
 ## Implementación de seguridad y documentación técnica
 
-**BlackBox** es un laboratorio práctico de administración y seguridad Linux diseñado para simular un entorno empresarial con restricciones de acceso departamentales y acceso controlado a recursos financieros.
+**Linux Server Hardening** es un laboratorio práctico de administración y seguridad Linux diseñado para simular un entorno empresarial con restricciones de acceso departamentales y acceso controlado a recursos financieros.
 
 Las siguientes secciones describen las configuraciones implementadas y validadas en el servidor, incluyendo las decisiones técnicas, los controles de seguridad y las evidencias correspondientes.
 
@@ -22,7 +24,7 @@ Las siguientes secciones describen las configuraciones implementadas y validadas
 
 ### Descripción general
 
-BlackBox incluye **21 cuentas de usuario locales**, distribuidas entre siete grupos organizativos y administrativos: Finanzas, Dirección, Recursos Humanos, Marketing, Desarrollo, Soporte IT y Administradores.
+Linux Server Hardening incluye **21 cuentas de usuario locales**, distribuidas entre siete grupos organizativos y administrativos: Finanzas, Dirección, Recursos Humanos, Marketing, Desarrollo, Soporte IT y Administradores.
 
 El modelo de gestión de identidades separa a los usuarios por departamentos y permite asignar y verificar sus pertenencias a los grupos correspondientes.
 
@@ -41,9 +43,9 @@ El modelo de gestión de identidades separa a los usuarios por departamentos y p
 
 Las cuentas y pertenencias a grupos se comprobaron mediante comandos como `id`, `getent` y la consulta de `/etc/passwd`.
 
-![Validación del aprovisionamiento de usuarios en BlackBox](screenshots/user-provisioning-validation.png)
+![Validación del aprovisionamiento de usuarios en Linux Server Hardening](screenshots/user-provisioning-validation.png)
 
-*Figura 1. Validación del aprovisionamiento y administración de cuentas de usuario en BlackBox.*
+*Figura 1. Validación del aprovisionamiento y administración de cuentas de usuario en Linux Server Hardening.*
 
 ### Competencias técnicas demostradas
 
@@ -114,7 +116,7 @@ Estas pruebas validan el comportamiento de acceso a nivel de directorio. Los per
 
 ### Descripción general
 
-BlackBox implementa una política centralizada de seguridad de contraseñas mediante PAM, `pam_pwquality` y un diccionario personalizado de CrackLib con términos en inglés, castellano y catalán/valenciano.
+Linux Server Hardening implementa una política centralizada de seguridad de contraseñas mediante PAM, `pam_pwquality` y un diccionario personalizado de CrackLib con términos en inglés, castellano y catalán/valenciano.
 
 Un script de aprovisionamiento en Bash facilita la creación consistente de usuarios, la asignación de grupos departamentales y la configuración del ciclo de vida de las contraseñas.
 
@@ -166,7 +168,7 @@ Las pruebas incluyeron la validación del rechazo de contraseñas, la configurac
 
 ### Descripción general
 
-Se implementó una solución automatizada de copias de seguridad y recuperación para el departamento financiero de BlackBox, centrada en la protección de datos, la fiabilidad operativa y la administración segura del servidor.
+Se implementó una solución automatizada de copias de seguridad y recuperación para el departamento financiero de Linux Server Hardening, centrada en la protección de datos, la fiabilidad operativa y la administración segura del servidor.
 
 El sistema utiliza un script Bash para crear, verificar y gestionar archivos comprimidos, con programación diaria mediante cron.
 
@@ -208,7 +210,7 @@ La nueva versión del script se desplegó en producción y se verificó la confi
 
 ![Validación de la restauración de copias de seguridad](screenshots/backup-restore-validation.png)
 
-*Figura 4. Validación de la recuperación de archivos desde una copia de seguridad de BlackBox.*
+*Figura 4. Validación de la recuperación de archivos desde una copia de seguridad de Linux Server Hardening.*
 
 **Evidencia adicional:**
 
@@ -225,9 +227,60 @@ La nueva versión del script se desplegó en producción y se verificó la confi
 
 ---
 
+# 5. Auditoría de seguridad — auditd
+
+### Descripción general
+
+Se configuró Linux Audit (`auditd`) para registrar operaciones de escritura y cambios de atributos en seis directorios departamentales bajo `/srv/projects/`. Los eventos permiten identificar la ruta afectada, la operación ejecutada, el usuario y el resultado.
+
+### Tecnologías y herramientas
+
+`Linux` · `auditd` · `auditctl` · `augenrules` · `ausearch` · `/etc/audit/rules.d/`
+
+### Implementación
+
+- Definición de reglas departamentales en `/etc/audit/rules.d/department-monitoring.rules`, utilizando `-p wa` y la clave común `department_changes`.
+- Configuración de auditoría para Dirección, Desarrollo, Soporte IT, Finanzas, Recursos Humanos y Marketing.
+- Carga y comprobación de reglas activas mediante `augenrules --load` y `auditctl -l`.
+- Análisis de eventos con `ausearch` para identificar comandos, rutas, llamadas al sistema, usuarios y resultados.
+
+### Validación y evidencias
+
+Se completaron nueve comprobaciones satisfactorias en cinco departamentos. La regla de Marketing se añadió a la configuración, pero no formó parte de estas pruebas de eventos.
+
+| Departamento | Operaciones verificadas | Resultado |
+|---|---|---|
+| Dirección | Creación, modificación, cambio de permisos y eliminación | 4/4 SUPERADAS |
+| Desarrollo | Creación de archivo (`dev1`) | SUPERADA |
+| Soporte IT | Creación y modificación (`it-02`) | 2/2 SUPERADAS |
+| Finanzas | Cambio de permisos (`subcfo`) | SUPERADA |
+| Recursos Humanos | Eliminación (`hr3`) | SUPERADA |
+
+La comprobación del subsistema de auditoría devolvió `enabled 1`, `lost 0` y `backlog 0`. Las reglas están almacenadas en el directorio de configuración persistente; no se ha probado su carga tras reiniciar.
+
+![Reglas de auditoría departamental activas](screenshots/auditd-department-rules.png)
+
+*Figura 5. Reglas departamentales cargadas en el subsistema de auditoría de Linux.*
+
+**Evidencias adicionales:**
+
+- [Evento de modificación de archivo en Soporte IT](screenshots/auditd-file-modification.png)
+- [Evento de eliminación de archivo en Recursos Humanos](screenshots/auditd-file-deletion.png)
+
+### Competencias técnicas demostradas
+
+`Auditoría Linux` · `Configuración de reglas auditd` · `Monitorización de archivos` · `Análisis de eventos de seguridad` · `Trazabilidad de usuarios` · `Recopilación de evidencias`
+
+### Documentación técnica
+
+- [Auditoría de seguridad — Español](docs/security-auditing.es.md)
+- [Security Auditing — English](docs/security-auditing.md)
+
+---
+
 ## Arquitectura del sistema
 
-Para consultar una visión global del entorno BlackBox, sus componentes de seguridad y la relación entre los módulos implementados:
+Para consultar una visión global del entorno Linux Server Hardening, sus componentes de seguridad y la relación entre los módulos implementados:
 
 - [Arquitectura del sistema — Español](docs/Architecture.es.md)
 - [System Architecture — English](docs/Architecture.md)
@@ -236,11 +289,11 @@ Para consultar una visión global del entorno BlackBox, sus componentes de segur
 
 ## Alcance del proyecto y futuras mejoras
 
-BlackBox es un laboratorio práctico de administración y seguridad Linux. Demuestra competencias de configuración, automatización y validación, pero no pretende representar una infraestructura empresarial de producción completa.
+Linux Server Hardening es un laboratorio práctico de administración y seguridad Linux. Demuestra competencias de configuración, automatización y validación, pero no pretende representar una infraestructura empresarial de producción completa.
 
 Entre las posibles mejoras futuras se encuentran:
 
-- Ampliación de la documentación de `auditd` y validación de eventos de seguridad.
+- Ampliación de los escenarios de validación de `auditd` y de la cobertura de eventos de seguridad.
 - Monitorización y alertas de seguridad centralizadas.
 - Copias de seguridad cifradas y almacenadas externamente.
 - Notificaciones automáticas ante fallos de backup.
@@ -253,10 +306,10 @@ Estas mejoras se plantean como trabajo futuro, no como funcionalidades ya implem
 
 ## Competencias técnicas generales
 
-`Administración de sistemas Linux` · `Gestión de identidades y accesos` · `Securización de sistemas` · `PAM` · `Permisos Unix` · `SGID` · `ACL POSIX` · `Automatización Bash` · `Cron` · `Copias de seguridad y recuperación` · `Documentación técnica`
+`Administración de sistemas Linux` · `Gestión de identidades y accesos` · `Securización de sistemas` · `PAM` · `Permisos Unix` · `SGID` · `ACL POSIX` · `Automatización Bash` · `Cron` · `Copias de seguridad y recuperación` · `Auditoría de seguridad` · `auditd` · `Documentación técnica`
 
 ---
 
-**BlackBox — Linux Server Hardening**
+**Linux Server Hardening — Linux Server Hardening**
 
 *Administración práctica de Linux, implementación de controles de seguridad, automatización y validación técnica.*
