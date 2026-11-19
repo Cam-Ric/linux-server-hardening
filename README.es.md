@@ -164,17 +164,19 @@ Las pruebas incluyeron la validación del rechazo de contraseñas, la configurac
 
 ---
 
-# 4. Copias de seguridad automatizadas y recuperación
+## 4. Copias de seguridad automatizadas y recuperación
 
 ### Descripción general
 
-Se implementó una solución automatizada de copias de seguridad y recuperación para el departamento financiero de Linux Server Hardening, centrada en la protección de datos, la fiabilidad operativa y la administración segura del servidor.
+Se implementó una solución automatizada de copias de seguridad y recuperación para el departamento financiero de **Linux Server Hardening**, centrada en la protección de datos, la fiabilidad operativa y la administración segura del servidor.
 
-El sistema utiliza un script Bash para crear, verificar y gestionar archivos comprimidos, con programación diaria mediante cron.
+El sistema combina un script Bash para la creación y gestión de backups con un validador desarrollado en Python, permitiendo comprobar de forma reproducible la integridad, seguridad y recuperación de las copias.
+
+La ejecución diaria está programada mediante `cron` a las **02:00**, utilizando privilegios administrativos.
 
 ### Tecnologías y herramientas
 
-`Linux` · `Bash` · `cron` · `tar` · `gzip` · `flock` · `find` · `cmp`
+`Linux` · `Bash` · `Python 3` · `cron` · `tar` · `gzip` · `flock` · `find` · `cmp` · `tarfile` · `pathlib` · `tempfile`
 
 ### Implementación
 
@@ -183,14 +185,17 @@ El sistema utiliza un script Bash para crear, verificar y gestionar archivos com
 - **Verificación de integridad:** Comprobaciones GZIP y TAR antes de publicar cada archivo.
 - **Protección contra concurrencia:** Bloqueo exclusivo mediante `flock` para impedir ejecuciones simultáneas.
 - **Prevención de sobrescrituras:** Protección frente al reemplazo accidental de copias existentes.
-- **Retención de 30 días:** Eliminación automatizada de copias antiguas mediante `find`, validada en un laboratorio aislado.
-- **Permisos restrictivos:** Directorio de backups con permisos `700` y nuevos archivos con permisos `600`.
-- **Pruebas de recuperación:** Restauración controlada y comparación de archivos mediante `cmp`.
-- **Registro de operaciones:** Logs con marcas de tiempo para documentar copias, errores y operaciones de retención.
+- **Retención de 30 días:** Eliminación automatizada de copias antiguas mediante `find`, validada previamente en un laboratorio aislado.
+- **Permisos restrictivos:** Directorio `/backup` con permisos `700` y archivos de backup con permisos `600`.
+- **Registro de operaciones:** Logs con marcas de tiempo para registrar ejecuciones, errores y operaciones de retención.
+- **Recuperación controlada:** Restauración de archivos y comparación con los originales mediante `cmp`.
+- **Validación automatizada:** Script Python independiente para comprobar el sistema sin ejecutar backups de producción ni eliminar archivos existentes.
 
 ### Validación y evidencias
 
-Se completaron correctamente las siguientes comprobaciones:
+#### Validación funcional y recuperación
+
+Se realizaron pruebas manuales para comprobar el funcionamiento del sistema de backups.
 
 | Prueba | Resultado |
 |---|---|
@@ -198,33 +203,85 @@ Se completaron correctamente las siguientes comprobaciones:
 | Verificación de integridad GZIP | SUPERADA |
 | Verificación de estructura TAR | SUPERADA |
 | Restauración controlada | SUPERADA |
-| Comparación de archivos restaurados | SUPERADA |
+| Comparación de archivos restaurados mediante `cmp` | SUPERADA |
 | Prevención de copias duplicadas | SUPERADA |
 | Permisos restrictivos | SUPERADA |
 | Eliminación por retención en laboratorio aislado | SUPERADA |
-| Registro de operaciones de retención | SUPERADA |
+| Registro de operaciones de retención en laboratorio | SUPERADA |
 | Despliegue del script en producción | COMPLETADO |
 | Configuración del cron de root | VERIFICADA |
 
-La nueva versión del script se desplegó en producción y se verificó la configuración de la tarea diaria de cron. La ejecución automática correcta de la versión actualizada deberá confirmarse mediante los registros posteriores de producción.
+![Validación de restauración de backups](screenshots/backup-restore-validation.png)
 
-![Validación de la restauración de copias de seguridad](screenshots/backup-restore-validation.png)
-
-*Figura 4. Validación de la recuperación de archivos desde una copia de seguridad de Linux Server Hardening.*
+*Figura 4. Restauración controlada y comprobación de archivos recuperados.*
 
 **Evidencia adicional:**
 
 - [Verificación de integridad de backups](screenshots/backup-integrity.png)
 
+#### Validación automatizada con Python
+
+Se desarrolló `tests/backup-validation.py` para automatizar las comprobaciones del sistema de copias de seguridad utilizando exclusivamente bibliotecas estándar de Python.
+
+El validador realiza las siguientes operaciones:
+
+- Comprueba la existencia, permisos de ejecución y sintaxis del script Bash de producción.
+- Verifica los directorios de origen y los permisos del almacenamiento.
+- Comprueba la disponibilidad de las herramientas necesarias.
+- Verifica la configuración de la política de retención de 30 días.
+- Selecciona automáticamente el backup de producción más reciente según la fecha de su nombre.
+- Comprueba la integridad GZIP y la lectura de la estructura TAR.
+- Verifica que el archivo contiene los directorios financieros esperados.
+- Revisa las rutas y los tipos de entradas antes de la extracción.
+- Realiza una restauración temporal en un directorio aislado.
+- Detecta backups que superan el umbral de retención sin eliminarlos.
+- Genera resultados `PASS`, `FAIL` y `WARN`, con un código de salida apropiado para automatización.
+
+**Resultados de la ejecución real:**
+
+| Métrica | Resultado |
+|---|---|
+| Comprobaciones superadas | **21 PASS** |
+| Comprobaciones fallidas | **0 FAIL** |
+| Advertencias | **2 WARN** |
+| Backup validado | `finance-2026-11-15.tar.gz` |
+| Integridad GZIP y TAR | SUPERADA |
+| Restauración temporal | SUPERADA |
+
+Las dos advertencias identificaron copias antiguas correspondientes al **12 y 17 de octubre de 2026**.
+
+Estos resultados demuestran que el validador detecta archivos que superan el período de retención. La eliminación automática en producción queda pendiente de confirmación mediante una ejecución de la versión actualizada del script.
+
+![Validación automatizada de backups con Python](screenshots/backup-python-validation.png)
+
+*Figura 5. Ejecución del validador Python con 21 comprobaciones correctas y detección de dos backups caducados.*
+
+**Evidencia de detección de retención:**
+
+![Detección de backups caducados](screenshots/backup-retention-detection.png)
+
+*Figura 6. Identificación automática de archivos que superan el umbral de retención de 30 días.*
+
+#### Programación y seguimiento operativo
+
+La tarea está configurada en el crontab de root:
+
+```cron
+0 2 * * * /usr/local/sbin/backup_finance.sh
+```
+
+Se verificó que el servicio `cron` estaba activo y habilitado, y se confirmó mediante los registros del sistema que ejecutó el comando de backup el **15 de noviembre de 2026 a las 02:00**.
+
+La versión actualizada del script se modificó el **18 de noviembre de 2026**. Por ello, queda pendiente confirmar una ejecución posterior que incluya la limpieza automática de backups caducados.
+
 ### Competencias técnicas demostradas
 
-`Administración de backups Linux` · `Automatización Bash` · `Programación con cron` · `Verificación de integridad` · `Control de concurrencia` · `Gestión de retención` · `Permisos seguros` · `Pruebas de recuperación`
+`Administración de backups Linux` · `Automatización Bash` · `Scripting Python` · `Programación cron` · `Verificación de integridad` · `Control de concurrencia` · `Gestión de retención` · `Permisos seguros` · `Recuperación de datos` · `Validación automatizada` · `Diagnóstico mediante logs`
 
 ### Documentación técnica
 
 - [Copias de seguridad y recuperación — Español](docs/backup-and-recovery.es.md)
 - [Backup & Recovery — English](docs/backup-and-recovery.md)
-
 ---
 
 # 5. Auditoría de seguridad — auditd
