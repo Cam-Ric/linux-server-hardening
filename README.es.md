@@ -164,7 +164,7 @@ Las pruebas incluyeron la validación del rechazo de contraseñas, la configurac
 
 ---
 
-## 4. Copias de seguridad automatizadas y recuperación
+# 4. Copias de seguridad automatizadas y recuperación
 
 ### Descripción general
 
