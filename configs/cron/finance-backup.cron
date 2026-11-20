@@ -1,0 +1,4 @@
+# Linux Server Hardening - Daily Finance Backup
+# Install in root's crontab.
+
+0 2 * * * /usr/local/sbin/backup_finance.sh
