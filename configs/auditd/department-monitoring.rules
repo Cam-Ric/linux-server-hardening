@@ -1,0 +1,9 @@
+# Linux Server Hardening - Departmental File Auditing
+# Monitor write operations and attribute changes.
+
+-w /srv/projects/management -p wa -k department_changes
+-w /srv/projects/developers -p wa -k department_changes
+-w /srv/projects/it-support -p wa -k department_changes
+-w /srv/projects/finance -p wa -k department_changes
+-w /srv/projects/human-resources -p wa -k department_changes
+-w /srv/projects/marketing -p wa -k department_changes
