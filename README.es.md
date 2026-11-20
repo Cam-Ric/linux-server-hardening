@@ -258,7 +258,7 @@ Estos resultados demuestran que el validador detecta archivos que superan el per
 
 **Evidencia de detección de retención:**
 
-![Detección de backups caducados](screenshots/backup-retention-detection.png)
+![Detección de backups caducados](screenshots/backup-retention-detention.png)
 
 *Figura 6. Identificación automática de archivos que superan el umbral de retención de 30 días.*
 
