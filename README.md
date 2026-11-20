@@ -158,59 +158,119 @@ Additional evidence:
 
 ---
 
-# 4. Automated Backup & Recovery
+# 4. Automated Backups & Recovery
 
 ### Overview
 
-Implemented an automated backup and recovery solution for the Linux Server Hardening finance department, focusing on data protection, operational reliability, and secure system administration.
+An automated backup and recovery solution was implemented for the Finance department within **Linux Server Hardening**, focusing on data protection, operational reliability, and secure Linux server administration.
 
-The system uses a Bash script to create, validate, and manage compressed backups, with daily scheduling through cron.
+The system combines a Bash script for backup creation and management with a Python validation tool, enabling reproducible checks of backup integrity, security, and recoverability.
+
+Daily execution is scheduled through `cron` at **02:00 AM**, using root privileges.
 
 ### Technologies & Tools
 
-`Linux` · `Bash` · `cron` · `tar` · `gzip` · `flock` · `find` · `cmp`
+`Linux` · `Bash` · `Python 3` · `cron` · `tar` · `gzip` · `flock` · `find` · `cmp` · `tarfile` · `pathlib` · `tempfile`
 
 ### Implementation
 
-- **Daily automation:** Backups scheduled at **02:00 AM** using the root crontab.
-- **Data protection:** Automated backups of `/home/cfo` and `/home/accountant1`.
-- **Integrity verification:** GZIP and TAR validation before publishing each archive.
+- **Daily automation:** Backups scheduled at **02:00 AM** through root's crontab.
+- **Data protection:** Backups of `/home/cfo` and `/home/accountant1`.
+- **Integrity verification:** GZIP and TAR checks before publishing each archive.
 - **Concurrency protection:** Exclusive locking with `flock` to prevent simultaneous executions.
-- **Overwrite prevention:** Existing daily backup archives cannot be silently replaced.
-- **30-day retention:** Automated cleanup of expired backups using `find`, validated in an isolated test environment.
-- **Restricted permissions:** Root-only backup directory (`700`) and new backup archives (`600`).
-- **Recovery testing:** Controlled restoration and file comparison using `cmp`.
-- **Operational logging:** Timestamped records of backup creation, errors, and retention operations.
+- **Overwrite prevention:** Safeguards against accidentally replacing existing backup archives.
+- **30-day retention:** Automated cleanup of expired archives using `find`, previously validated in an isolated laboratory environment.
+- **Restrictive permissions:** `/backup` directory permissions set to `700` and backup archive permissions set to `600`.
+- **Operation logging:** Timestamped logs for backup executions, errors, and retention operations.
+- **Controlled recovery:** File restoration and comparison against original files using `cmp`.
+- **Automated validation:** An independent Python script checks the backup system without executing production backups or deleting existing archives.
 
 ### Validation & Evidence
 
-The following tests were successfully completed:
+#### Functional Validation and Recovery Testing
+
+Manual tests were performed to verify backup creation, integrity, security, and recovery.
 
 | Test | Result |
 |---|---|
-| Backup creation | PASS |
-| GZIP integrity verification | PASS |
-| TAR archive verification | PASS |
-| Controlled file restoration | PASS |
-| Restored file comparison | PASS |
-| Duplicate backup prevention | PASS |
-| Restrictive archive permissions | PASS |
-| Retention cleanup in isolated laboratory | PASS |
-| Retention operation logging | PASS |
+| Backup creation | PASSED |
+| GZIP integrity verification | PASSED |
+| TAR archive structure verification | PASSED |
+| Controlled backup restoration | PASSED |
+| Restored file comparison using `cmp` | PASSED |
+| Duplicate backup prevention | PASSED |
+| Restrictive file permissions | PASSED |
+| Retention cleanup in an isolated laboratory | PASSED |
+| Retention operation logging in the laboratory | PASSED |
 | Production script deployment | COMPLETED |
 | Root cron configuration | VERIFIED |
 
-The updated backup script was deployed to production and the daily cron job was verified as configured. Successful scheduled execution of the updated version should be confirmed using subsequent production logs.
+![Backup Restoration Validation](screenshots/backup-restore-validation.png)
 
-![Backup restoration validation](screenshots/backup-restore-validation.png)
+*Figure 4. Controlled backup restoration and verification of recovered files.*
 
-Additional evidence:
+**Additional evidence:**
 
-- [Backup integrity validation](screenshots/backup-integrity.png)
+- [Backup Integrity Verification](screenshots/backup-integrity.png)
+
+#### Automated Backup Validation with Python
+
+A Python validation tool, `tests/backup-validation.py`, was developed to automate backup system checks using only Python's standard library.
+
+The validator performs the following operations:
+
+- Checks the existence, executable permissions, and Bash syntax of the production backup script.
+- Verifies Finance source directories and backup storage permissions.
+- Checks the availability of required system utilities.
+- Verifies the configured 30-day retention policy.
+- Automatically selects the most recent production backup based on its filename date.
+- Validates GZIP integrity and TAR archive readability.
+- Confirms that the expected Finance directories are included in the archive.
+- Validates archive entry paths and types before extraction.
+- Performs temporary restoration in an isolated directory.
+- Detects archives exceeding the retention threshold without deleting them.
+- Produces `PASS`, `FAIL`, and `WARN` results with an exit code suitable for automation.
+
+**Observed results from the production server:**
+
+| Metric | Result |
+|---|---|
+| Successful checks | **21 PASS** |
+| Failed checks | **0 FAIL** |
+| Retention warnings | **2 WARN** |
+| Validated backup | `finance-2026-11-15.tar.gz` |
+| GZIP and TAR integrity | PASSED |
+| Temporary restoration | PASSED |
+
+The two warnings identified backup archives dated **October 12 and October 17, 2026**, which exceeded the configured retention threshold.
+
+These results demonstrate that the validator can detect expired backup archives. Automatic retention cleanup in production still requires confirmation through an execution of the updated backup script.
+
+![Automated Python Backup Validation](screenshots/backup-python-validation.png)
+
+*Figure 5. Python backup validation showing 21 successful checks and two retention warnings.*
+
+**Retention detection evidence:**
+
+![Expired Backup Detection](screenshots/backup-retention-detention.png)
+
+*Figure 6. Automated detection of backup archives exceeding the 30-day retention threshold.*
+
+#### Scheduling and Operational Monitoring
+
+The backup job is configured in root's crontab:
+
+```cron
+0 2 * * * /usr/local/sbin/backup_finance.sh
+```
+
+The `cron` service was verified as active and enabled. System logs confirmed that cron launched the backup command on **November 15, 2026, at 02:00 AM**.
+
+The production backup script was last modified on **November 19, 2026**. A subsequent scheduled execution is required to confirm automatic retention cleanup using the updated version.
 
 ### Technical Skills Demonstrated
 
-`Linux Backup Administration` · `Bash Automation` · `Cron Scheduling` · `Archive Integrity Verification` · `Concurrency Control` · `Backup Retention Management` · `Secure File Permissions` · `Disaster Recovery Testing`
+`Linux Backup Administration` · `Bash Automation` · `Python Scripting` · `Cron Scheduling` · `Integrity Verification` · `Concurrency Control` · `Retention Management` · `Secure File Permissions` · `Data Recovery` · `Automated Validation` · `Log-Based Troubleshooting`
 
 ### Technical Documentation
 
